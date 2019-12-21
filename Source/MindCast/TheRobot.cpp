@@ -52,6 +52,9 @@ void ATheRobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ATheRobot::Jump);
 	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &ATheRobot::StartRunning);
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &ATheRobot::StopRunning);
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ATheRobot::StartAiming);
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ATheRobot::StopAiming);
+	
 
 }
 
@@ -84,9 +87,6 @@ void ATheRobot::RotateCamera(float AxisValue)
 	else if (CameraPitch > 73.f) RobotCamera->SetRelativeRotation(
 		FRotator(72.5f, RobotCamera->GetRelativeTransform().Rotator().Yaw, RobotCamera->GetRelativeTransform().Rotator().Roll));
 	
-
-	//GetMesh()->SetBone
-
 	//-83.5 - 76.0
 }
 
@@ -104,3 +104,15 @@ void ATheRobot::StopRunning()
 {
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 }
+
+/*
+void ATheRobot::StartAiming()
+{
+	bIsAiming = true;
+}
+
+void ATheRobot::StopAiming()
+{
+	bIsAiming = false;
+}
+*/

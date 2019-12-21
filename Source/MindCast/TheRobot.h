@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "TheRobot.generated.h"
 
 UCLASS()
@@ -44,11 +45,21 @@ public:
 	void StartRunning();
 	void StopRunning();
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartAiming();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void StopAiming();
+
 	UCharacterMovementComponent* OurMovementComponent;
+
+	UPROPERTY(EditAnywhere)
+	float CameraPitch{ 0.f };
+	
 
 private:
 
 	FVector V{ 0.f, 0.f, 0.f };
 	float m_speed{ 0.f };
-	float CameraPitch{ 0.f };
+	
 };
