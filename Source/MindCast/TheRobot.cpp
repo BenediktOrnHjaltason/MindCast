@@ -4,6 +4,13 @@
 #include "TheRobot.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerController.h"
+#include "Engine.h"
+#include "DrawDebugHelpers.h"
+#include "Engine/DecalActor.h"
+#include "PhysicsProp.h"
+//#include "Math/Vector.h"
 
 
 // Sets default values
@@ -17,6 +24,8 @@ ATheRobot::ATheRobot()
 
 	Arms = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Arms"));
 	Arms->SetupAttachment(RobotCamera);
+
+
 }
 
 // Called when the game starts or when spawned
@@ -24,20 +33,18 @@ void ATheRobot::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	CurrentWorld = GetWorld();
+	CurrentPlayerController = UGameplayStatics::GetPlayerController(CurrentWorld, 0);
+
+	MuzzleSocketRef = GunRef->GetStaticMesh()->FindSocket(TEXT("Muzzle"));
+
+	CharMoveCompRef = GetCharacterMovement();
 }
 
 // Called every frame
 void ATheRobot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	V = GetCharacterMovement()->Velocity;
-	m_speed = UKismetMathLibrary::Sqrt(UKismetMathLibrary::MultiplyMultiply_FloatFloat(V.X, 2.f) +
-		UKismetMathLibrary::MultiplyMultiply_FloatFloat(V.Y, 2.f) +
-		UKismetMathLibrary::MultiplyMultiply_FloatFloat(V.Z, 2.f));
-
-
-	UE_LOG(LogTemp, Warning, TEXT("Camera pitch: %f"), RobotCamera->GetRelativeTransform().Rotator().Pitch)
 }
 
 // Called to bind functionality to input
@@ -54,18 +61,28 @@ void ATheRobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &ATheRobot::StopRunning);
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ATheRobot::StartAiming);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ATheRobot::StopAiming);
-	
-
+	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &ATheRobot::Shoot);
 }
 
 void ATheRobot::MoveForwardAxis(float AxisValue)
 {
+	AxisInput_ForwardBackward = AxisValue * CharMoveCompRef->MaxWalkSpeed;
+
 	AddMovementInput(GetActorForwardVector(), AxisValue);
 }
 
 void ATheRobot::MoveSidewaysAxis(float AxisValue)
 {
+	AxisInput_Strafe = AxisValue * CharMoveCompRef->MaxWalkSpeed;
+
 	AddMovementInput(GetActorRightVector(), AxisValue);
+
+	RobotCamera->SetRelativeRotation(
+		UKismetMathLibrary::RLerp(
+			FRotator(RobotCamera->GetRelativeTransform().Rotator().Pitch,
+				0.f, 0.f),
+			FRotator(RobotCamera->GetRelativeTransform().Rotator().Pitch,
+				0.f, 3.f), AxisValue,true));
 }
 
 void ATheRobot::RotatePlayer(float AxisValue)
@@ -105,14 +122,78 @@ void ATheRobot::StopRunning()
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 }
 
-/*
-void ATheRobot::StartAiming()
+void ATheRobot::Shoot()
 {
-	bIsAiming = true;
-}
+	MuzzleLoc = GunRef->GetSocketLocation("Muzzle");
 
-void ATheRobot::StopAiming()
-{
-	bIsAiming = false;
+	PlayMuzzleEffect();
+	JoltArms();
+	UGameplayStatics::PlaySound2D(CurrentWorld, RifleSound);
+
+	//CurrentWorld->SpawnActor<AProjectileBase>(ProjectileToSpawn, MuzzleLoc, FVector(TraceEndPoint - MuzzleLoc).ToOrientationRotator()
+		//);
+
+	ViewportSize = GEngine->GameViewport->Viewport->GetSizeXY();
+
+	//Fills ViewportCenterWorldLoc and Direction as OutParameter
+	CurrentPlayerController->DeprojectScreenPositionToWorld(ViewportSize.X / 2, ViewportSize.Y / 2, ViewportCenterWorldLoc, ViewportCenterDirection);
+
+	TraceEndPoint = (RobotCamera->GetForwardVector() * 5000) + ViewportCenterWorldLoc;
+
+	//DrawDebugLine(CurrentWorld, ViewportCenterWorldLoc + (RobotCamera->GetForwardVector() * 100), TraceEndPoint, FColor::Red, false, 0.1, 0, 2.f);
+
+	CurrentWorld->LineTraceSingleByChannel(
+		LineTraceHit,
+		ViewportCenterWorldLoc + (RobotCamera->GetForwardVector() * 100),
+		TraceEndPoint,
+		ECollisionChannel::ECC_GameTraceChannel7
+	);
+
+	//Outparam vars are in .h
+	UGameplayStatics::BreakHitResult(LineTraceHit, bBlockingHit, bInitOverlap, time, distance, TraceHitLocation, ImpactPoint,
+		normal, impactNormal, physMat, hitActor, hitComp, hitBoneName, hitItem, faceIndex, traceStart, traceEnd);
+
+	if (hitActor) {
+		UE_LOG(LogTemp, Warning, TEXT("Actor hit: %s"), *hitActor->GetActorLabel())
+			
+			
+
+		ADecalActor* NewDecal = CurrentWorld->SpawnActor<ADecalActor>(
+			RifleDecalActor, (ImpactPoint + normal * 10), normal.Rotation() + FRotator(-90, 0, 0));
+
+			BulletDecalsQueue.Enqueue(NewDecal);
+
+			//AttachToTarget
+			
+			NewDecal->AttachToActor(
+				hitActor, FAttachmentTransformRules(
+					EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true));
+					
+
+		BulletQueueCounter++;
+
+		if (BulletQueueCounter > 19) {
+
+			ADecalActor* temp;
+			BulletDecalsQueue.Dequeue(temp);
+			temp->Destroy();
+			BulletQueueCounter--;
+		}
+
+		HitPhysicsProp = Cast<APhysicsProp>(hitActor);
+		if (HitPhysicsProp) {
+
+			UE_LOG(LogTemp, Warning, TEXT("Hit physics prop"))
+			ImpulseDirection = ImpactPoint - MuzzleLoc;
+			UKismetMathLibrary::Vector_Normalize(ImpulseDirection);
+
+			HitPhysicsProp->Mesh->AddImpulse(ImpulseDirection * HitPhysicsProp->Mesh->GetMass() * 1000);
+			HitPhysicsProp = nullptr;
+		}
+			
+		hitActor = nullptr;
+		
+	}
+	else	UE_LOG(LogTemp, Warning, TEXT("Not tracing actor"))
+	
 }
-*/
