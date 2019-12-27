@@ -114,11 +114,14 @@ void ATheRobot::Jump()
 
 void ATheRobot::StartRunning()
 {
+	IncreaseFOV();
 	GetCharacterMovement()->MaxWalkSpeed = 1500.f;
+	
 }
 
 void ATheRobot::StopRunning()
 {
+	DecreaseFOV();
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 }
 
@@ -142,10 +145,17 @@ void ATheRobot::Shoot()
 
 	//DrawDebugLine(CurrentWorld, ViewportCenterWorldLoc + (RobotCamera->GetForwardVector() * 100), TraceEndPoint, FColor::Red, false, 0.1, 0, 2.f);
 
+	AimOffsett = (c_bIsAiming == false) ?  FVector(UKismetMathLibrary::RandomFloatInRange(-160.f, 160.f),
+		UKismetMathLibrary::RandomFloatInRange(-160.f, 160.5), UKismetMathLibrary::RandomFloatInRange(-160.f, 160.5)) : 
+		FVector(UKismetMathLibrary::RandomFloatInRange(-60.f, 60.f),
+			UKismetMathLibrary::RandomFloatInRange(-60.f, 60.f), UKismetMathLibrary::RandomFloatInRange(-60.f, 60.f));
+
+	UE_LOG(LogTemp, Warning, TEXT("AimOffsett is %s"), *AimOffsett.ToString())
+
 	CurrentWorld->LineTraceSingleByChannel(
 		LineTraceHit,
 		ViewportCenterWorldLoc + (RobotCamera->GetForwardVector() * 100),
-		TraceEndPoint,
+		TraceEndPoint + AimOffsett,
 		ECollisionChannel::ECC_GameTraceChannel7
 	);
 

@@ -24,7 +24,7 @@ public:
 
 
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UCameraComponent* RobotCamera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -53,7 +53,11 @@ public:
 	void RotateCamera(float AxisValue);
 	void Jump();
 	void StartRunning();
+	UFUNCTION(BlueprintImplementableEvent)
+		void IncreaseFOV();
 	void StopRunning();
+	UFUNCTION(BlueprintImplementableEvent)
+		void DecreaseFOV();
 	void Shoot();
 
 	UFUNCTION(BlueprintImplementableEvent)
@@ -112,6 +116,8 @@ public:
 	//---/HitResultVars
 
 
+	FVector AimOffsett{ 0,0,0 };
+
 	//--Projectile--//
 	UPROPERTY(EditAnywhere, Category="Spawning")
 	TSubclassOf<AProjectileBase>ProjectileToSpawn;
@@ -142,7 +148,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AxisInput_Strafe{ 0.f };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool c_bIsAiming{ false };
+
 private:
+
+	
 
 	
 };
