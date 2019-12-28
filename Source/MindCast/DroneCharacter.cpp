@@ -3,6 +3,7 @@
 
 #include "DroneCharacter.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ADroneCharacter::ADroneCharacter()
@@ -60,6 +61,7 @@ void ADroneCharacter::Descend(float AxisValue)
 void ADroneCharacter::MoveForwardBackward(float AxisValue)
 {
 	AddMovementInput(GetActorForwardVector(), AxisValue);
+	UE_LOG(LogTemp, Warning, TEXT("MoveForwardBackward called, AxisValue %f"), AxisValue)
 }
 void ADroneCharacter::MoveSideways(float AxisValue)
 {
@@ -69,6 +71,7 @@ void ADroneCharacter::MoveSideways(float AxisValue)
 void ADroneCharacter::RotateDroneYaw(float AxisValue)
 {
 	AddControllerYawInput(AxisValue * 0.2f);
+
 }
 
 void ADroneCharacter::RotateDronePitch(float AxisValue)
@@ -84,4 +87,9 @@ void ADroneCharacter::CallRotateToDeployed()
 void ADroneCharacter::CallRotateToBackPack()
 {
 	RotateToBackPack();
+}
+
+void ADroneCharacter::CallLiftFromBackPack()
+{
+	LiftFromBackPack();
 }

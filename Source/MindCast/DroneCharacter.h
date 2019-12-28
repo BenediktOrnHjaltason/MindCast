@@ -44,6 +44,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void CallRotateToBackPack();
 
+	UFUNCTION(BlueprintImplementableEvent)
+		void LiftFromBackPack();
+	UFUNCTION(BlueprintCallable)
+		void CallLiftFromBackPack();
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

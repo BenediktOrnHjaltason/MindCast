@@ -110,6 +110,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void ShootUpDrone();
 
+	UFUNCTION(BlueprintCallable)
+		void PossessDrone();
+
 	
 
 	//--/Drone deployment

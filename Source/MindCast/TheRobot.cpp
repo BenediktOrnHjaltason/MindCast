@@ -222,12 +222,17 @@ void ATheRobot::DeployDrone()
 	DisableInput(CurrentPlayerController);
 	SwitchToDroneCamera();
 	OpenBackpack();
-
+	//Blueprint calls ShootUpDrone after OpenBackpack
 }
 
 void ATheRobot::ShootUpDrone()
 {
-	SpawnedDrone->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	SpawnedDrone->GetCapsuleComponent()->SetSimulatePhysics(true);
-	SpawnedDrone->GetCapsuleComponent()->AddImpulse(GetActorUpVector()*5000);
+	//SpawnedDrone->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	//SpawnedDrone->GetCapsuleComponent()->SetSimulatePhysics(true);
+	//SpawnedDrone->GetCapsuleComponent()->AddImpulse(GetActorUpVector()*5000);
+}
+
+void ATheRobot::PossessDrone()
+{
+	CurrentPlayerController->Possess(SpawnedDrone);
 }
