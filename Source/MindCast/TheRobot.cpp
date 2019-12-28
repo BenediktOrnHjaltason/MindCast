@@ -24,8 +24,6 @@ ATheRobot::ATheRobot()
 
 	Arms = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Arms"));
 	Arms->SetupAttachment(RobotCamera);
-
-
 }
 
 // Called when the game starts or when spawned

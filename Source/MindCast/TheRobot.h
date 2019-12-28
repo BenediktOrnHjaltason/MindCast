@@ -11,6 +11,7 @@
 #include "ProjectileBase.h"
 #include "Materials/MaterialInterface.h"
 #include "Sound/SoundBase.h"
+#include "Components/ChildActorComponent.h"
 #include "TheRobot.generated.h"
 
 UCLASS()
@@ -35,6 +36,20 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = Sound)
 		USoundBase* RifleSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMeshComponent* BackpackBase;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMeshComponent* BackpackLeftDoor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMeshComponent* BackpackRightDoor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UChildActorComponent* Drone;
+
+
 
 protected:
 	// Called when the game starts or when spawned
