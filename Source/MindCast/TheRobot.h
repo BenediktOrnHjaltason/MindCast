@@ -12,6 +12,7 @@
 #include "Materials/MaterialInterface.h"
 #include "Sound/SoundBase.h"
 #include "Components/ChildActorComponent.h"
+#include "DroneCharacter.h"
 #include "TheRobot.generated.h"
 
 UCLASS()
@@ -46,8 +47,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UStaticMeshComponent* BackpackRightDoor;
 
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<ADroneCharacter> DroneToSpawn;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		UChildActorComponent* Drone;
+	ADroneCharacter* SpawnedDrone;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	AActor* SpawnedDroneActor;
 
 
 
@@ -86,6 +93,26 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void JoltArms();
+
+	//--Drone deployment
+
+	//Main function
+	void DeployDrone();
+
+	void SwitchToDroneCamera();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void OpenBackpack();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void CloseBackpack();
+
+	UFUNCTION(BlueprintCallable)
+		void ShootUpDrone();
+
+	
+
+	//--/Drone deployment
 
 	UCharacterMovementComponent* OurMovementComponent;
 
@@ -168,7 +195,4 @@ public:
 
 private:
 
-	
-
-	
 };

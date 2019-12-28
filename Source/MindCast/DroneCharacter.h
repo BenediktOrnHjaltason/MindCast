@@ -18,13 +18,13 @@ public:
 	// Sets default values for this character's properties
 	ADroneCharacter();
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UStaticMeshComponent* DroneMesh;
 
 	UPROPERTY(EditAnywhere)
 		USpringArmComponent* SpringArm;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UCameraComponent* Camera;
 
 	void Ascend(float AxisValue);
@@ -33,6 +33,16 @@ public:
 	void MoveSideways(float AxisValue);
 	void RotateDroneYaw(float AxisValue);
 	void RotateDronePitch(float AxisValue);
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void RotateToDeployed();
+	UFUNCTION(BlueprintCallable)
+		void CallRotateToDeployed();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void RotateToBackPack();
+	UFUNCTION(BlueprintCallable)
+		void CallRotateToBackPack();
 
 protected:
 	// Called when the game starts or when spawned

@@ -2,6 +2,7 @@
 
 
 #include "DroneCharacter.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 ADroneCharacter::ADroneCharacter()
@@ -24,7 +25,6 @@ ADroneCharacter::ADroneCharacter()
 void ADroneCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -76,3 +76,12 @@ void ADroneCharacter::RotateDronePitch(float AxisValue)
 	AddControllerPitchInput(-AxisValue * 0.2f);
 }
 
+void ADroneCharacter::CallRotateToDeployed()
+{
+	RotateToDeployed();
+}
+
+void ADroneCharacter::CallRotateToBackPack()
+{
+	RotateToBackPack();
+}

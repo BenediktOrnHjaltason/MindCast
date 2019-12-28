@@ -37,6 +37,13 @@ void ATheRobot::BeginPlay()
 	MuzzleSocketRef = GunRef->GetStaticMesh()->FindSocket(TEXT("Muzzle"));
 
 	CharMoveCompRef = GetCharacterMovement();
+
+	SpawnedDrone = CurrentWorld->SpawnActor<ADroneCharacter>(
+		DroneToSpawn, GetMesh()->GetSocketByName("BackpackSocket")->GetSocketLocation(GetMesh()), GetActorForwardVector().Rotation());
+
+	SpawnedDrone->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepWorld, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true), "BackpackSocket");
+	SpawnedDroneActor = SpawnedDrone;
+	
 }
 
 // Called every frame
@@ -60,6 +67,7 @@ void ATheRobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ATheRobot::StartAiming);
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ATheRobot::StopAiming);
 	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &ATheRobot::Shoot);
+	PlayerInputComponent->BindAction("DeployDrone", IE_Pressed, this, &ATheRobot::DeployDrone);
 }
 
 void ATheRobot::MoveForwardAxis(float AxisValue)
@@ -101,8 +109,6 @@ void ATheRobot::RotateCamera(float AxisValue)
 
 	else if (CameraPitch > 73.f) RobotCamera->SetRelativeRotation(
 		FRotator(72.5f, RobotCamera->GetRelativeTransform().Rotator().Yaw, RobotCamera->GetRelativeTransform().Rotator().Roll));
-	
-	//-83.5 - 76.0
 }
 
 void ATheRobot::Jump()
@@ -204,4 +210,24 @@ void ATheRobot::Shoot()
 	}
 	else	UE_LOG(LogTemp, Warning, TEXT("Not tracing actor"))
 	
+}
+
+void ATheRobot::SwitchToDroneCamera()
+{
+	CurrentPlayerController->SetViewTargetWithBlend(SpawnedDroneActor, 0.25f, EViewTargetBlendFunction::VTBlend_EaseIn);
+}
+
+void ATheRobot::DeployDrone()
+{
+	DisableInput(CurrentPlayerController);
+	SwitchToDroneCamera();
+	OpenBackpack();
+
+}
+
+void ATheRobot::ShootUpDrone()
+{
+	SpawnedDrone->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	SpawnedDrone->GetCapsuleComponent()->SetSimulatePhysics(true);
+	SpawnedDrone->GetCapsuleComponent()->AddImpulse(GetActorUpVector()*5000);
 }
