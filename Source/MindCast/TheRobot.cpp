@@ -214,7 +214,7 @@ void ATheRobot::Shoot()
 
 void ATheRobot::SwitchToDroneCamera()
 {
-	CurrentPlayerController->SetViewTargetWithBlend(SpawnedDroneActor, 0.25f, EViewTargetBlendFunction::VTBlend_EaseIn);
+	CurrentPlayerController->SetViewTargetWithBlend(SpawnedDroneActor, 1.f, EViewTargetBlendFunction::VTBlend_EaseIn);
 }
 
 void ATheRobot::DeployDrone()
