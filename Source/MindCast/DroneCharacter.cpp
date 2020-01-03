@@ -32,7 +32,6 @@ void ADroneCharacter::BeginPlay()
 void ADroneCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -61,7 +60,6 @@ void ADroneCharacter::Descend(float AxisValue)
 void ADroneCharacter::MoveForwardBackward(float AxisValue)
 {
 	AddMovementInput(GetActorForwardVector(), AxisValue);
-	UE_LOG(LogTemp, Warning, TEXT("MoveForwardBackward called, AxisValue %f"), AxisValue)
 }
 void ADroneCharacter::MoveSideways(float AxisValue)
 {

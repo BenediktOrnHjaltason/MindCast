@@ -94,6 +94,15 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void JoltArms();
 
+	//--Overlaps--//
+
+	UFUNCTION()
+		void Overlaps(UPrimitiveComponent* OverlappedComponent, AActor *OtherActor,
+			UPrimitiveComponent *OtherComponent, int32 OtherBodyIndex,
+			bool bFromSweep, const FHitResult &SweepResult);
+
+	//--/Overlaps--//
+
 	//--Drone deployment
 
 	//Main function
@@ -108,14 +117,20 @@ public:
 		void CloseBackpack();
 
 	UFUNCTION(BlueprintCallable)
-		void ShootUpDrone();
-
-	UFUNCTION(BlueprintCallable)
 		void PossessDrone();
 
-	
+	//---/Drone deployment--//
+	//--Receive drone--//
 
-	//--/Drone deployment
+	//Triggered in Overlap function
+	void ReceiveDrone();
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void PlaceDroneInBag();
+
+	//--/Receive drone--//
+
+
 
 	UCharacterMovementComponent* OurMovementComponent;
 
@@ -195,6 +210,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool c_bIsAiming{ false };
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FVector DroneLocationBeforeDeploy;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FRotator DroneRotationBeforeDeploy;
+
 
 private:
 

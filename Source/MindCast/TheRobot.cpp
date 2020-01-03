@@ -43,6 +43,8 @@ void ATheRobot::BeginPlay()
 
 	SpawnedDrone->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepWorld, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true), "BackpackSocket");
 	SpawnedDroneActor = SpawnedDrone;
+
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ATheRobot::Overlaps);
 	
 }
 
@@ -83,6 +85,7 @@ void ATheRobot::MoveSidewaysAxis(float AxisValue)
 
 	AddMovementInput(GetActorRightVector(), AxisValue);
 
+	//Tilting based on movement
 	RobotCamera->SetRelativeRotation(
 		UKismetMathLibrary::RLerp(
 			FRotator(RobotCamera->GetRelativeTransform().Rotator().Pitch,
@@ -219,20 +222,36 @@ void ATheRobot::SwitchToDroneCamera()
 
 void ATheRobot::DeployDrone()
 {
+	DroneLocationBeforeDeploy = SpawnedDrone->GetActorLocation();
+	DroneRotationBeforeDeploy = SpawnedDrone->GetActorRotation();
+
 	DisableInput(CurrentPlayerController);
 	SwitchToDroneCamera();
 	OpenBackpack();
-	//Blueprint calls ShootUpDrone after OpenBackpack
-}
-
-void ATheRobot::ShootUpDrone()
-{
-	//SpawnedDrone->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	//SpawnedDrone->GetCapsuleComponent()->SetSimulatePhysics(true);
-	//SpawnedDrone->GetCapsuleComponent()->AddImpulse(GetActorUpVector()*5000);
 }
 
 void ATheRobot::PossessDrone()
 {
 	CurrentPlayerController->Possess(SpawnedDrone);
+}
+
+void ATheRobot::Overlaps(UPrimitiveComponent* OverlappedComponent, AActor *OtherActor,
+	UPrimitiveComponent *OtherComponent, int32 OtherBodyIndex,
+	bool bFromSweep, const FHitResult &SweepResult)
+{
+	if (OtherActor->IsA(ADroneCharacter::StaticClass())) ReceiveDrone();
+}
+
+void ATheRobot::ReceiveDrone()
+{
+	SpawnedDrone->GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	UE_LOG(LogTemp, Warning, TEXT("ReceiveDrone called, Overlaps OK"))
+
+	SpawnedDrone->DisableInput(CurrentPlayerController);
+	//SpawnedDrone->GetCharacterMovement()->Deactivate();
+	SpawnedDrone->GetCharacterMovement()->StopMovementImmediately();
+
+	PlaceDroneInBag();
+
+	//SpawnedDrone->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepWorld, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true), "BackpackSocket");
 }
