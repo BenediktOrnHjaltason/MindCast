@@ -244,14 +244,45 @@ void ATheRobot::Overlaps(UPrimitiveComponent* OverlappedComponent, AActor *Other
 
 void ATheRobot::ReceiveDrone()
 {
-	SpawnedDrone->GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
-	UE_LOG(LogTemp, Warning, TEXT("ReceiveDrone called, Overlaps OK"))
-
-	SpawnedDrone->DisableInput(CurrentPlayerController);
-	//SpawnedDrone->GetCharacterMovement()->Deactivate();
 	SpawnedDrone->GetCharacterMovement()->StopMovementImmediately();
+	SpawnedDrone->GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+	SpawnedDrone->DisableInput(CurrentPlayerController);
+
+	CurrentPlayerController->bAutoManageActiveCameraTarget = false;
+
+	CurrentPlayerController->UnPossess();
+
+	CurrentPlayerController->SetViewTarget(SpawnedDrone);
+	
+	
+	
+
+	DroneLocationAtReentry = SpawnedDrone->GetActorLocation();
+	DroneRotationAtReentry = SpawnedDrone->GetActorRotation();
+
+	BackPackLoc = GetMesh()->GetSocketLocation("BackpackSocket");
+	BackPackAboveLoc = BackPackAboveLoc + FVector(0, 0, 20);
 
 	PlaceDroneInBag();
 
 	//SpawnedDrone->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepWorld, EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, true), "BackpackSocket");
+}
+
+void ATheRobot::LerpDroneAboveBackPack(float Timeline)
+{
+	SpawnedDrone->SetActorLocation(UKismetMathLibrary::VLerp(DroneLocationAtReentry, DroneLocationBeforeDeploy, Timeline));
+	SpawnedDrone->SetActorRotation(
+		UKismetMathLibrary::RLerp(DroneRotationAtReentry, DroneRotationBeforeDeploy, Timeline, false));
+}
+
+void ATheRobot::LerpDroneIntoBackPack(float Timeline)
+{
+	SpawnedDrone->SetActorLocation(UKismetMathLibrary::VLerp(BackPackAboveLoc, BackPackLoc, Timeline));
+}
+
+void ATheRobot::RepossessRobot()
+{
+	CurrentPlayerController->Possess(this);
+	CurrentPlayerController->SetViewTargetWithBlend(this, 0.3);
+	EnableInput(CurrentPlayerController);
 }

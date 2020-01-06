@@ -113,7 +113,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void OpenBackpack();
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 		void CloseBackpack();
 
 	UFUNCTION(BlueprintCallable)
@@ -127,6 +127,15 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 		void PlaceDroneInBag();
+
+	UFUNCTION(BlueprintCallable)
+	void LerpDroneAboveBackPack(float Timeline);
+
+	UFUNCTION(BlueprintCallable)
+		void LerpDroneIntoBackPack(float Timeline);
+
+	UFUNCTION(BlueprintCallable)
+		void RepossessRobot();
 
 	//--/Receive drone--//
 
@@ -152,6 +161,9 @@ public:
 	//Set from blueprint (Didn't get socket functionality on mesh added from C++)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FVector MuzzleLoc;
+
+	FVector BackPackLoc{0,0,0};
+	FVector BackPackAboveLoc{0,0,0};
 
 	UStaticMeshSocket* MuzzleSocketRef;
 
@@ -216,6 +228,13 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FRotator DroneRotationBeforeDeploy;
+
+	FVector DroneLocationAtReentry;
+	FRotator DroneRotationAtReentry;
+
+	
+
+
 
 
 private:
