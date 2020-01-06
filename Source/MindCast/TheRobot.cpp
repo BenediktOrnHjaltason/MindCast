@@ -10,6 +10,7 @@
 #include "DrawDebugHelpers.h"
 #include "Engine/DecalActor.h"
 #include "PhysicsProp.h"
+#include "Grenade.h"
 //#include "Math/Vector.h"
 
 
@@ -197,15 +198,19 @@ void ATheRobot::Shoot()
 			BulletQueueCounter--;
 		}
 
-		HitPhysicsProp = Cast<APhysicsProp>(hitActor);
-		if (HitPhysicsProp) {
-
+		
+		if (Cast<APhysicsProp>(hitActor)) {
+			HitPhysicsProp = Cast<APhysicsProp>(hitActor);
 			UE_LOG(LogTemp, Warning, TEXT("Hit physics prop"))
 			ImpulseDirection = ImpactPoint - MuzzleLoc;
 			UKismetMathLibrary::Vector_Normalize(ImpulseDirection);
 
-			HitPhysicsProp->Mesh->AddImpulse(ImpulseDirection * HitPhysicsProp->Mesh->GetMass() * 1000);
+			HitPhysicsProp->Mesh->AddImpulse(ImpulseDirection * HitPhysicsProp->Mesh->GetMass() * 6000);
 			HitPhysicsProp = nullptr;
+		}
+		else if (Cast<AGrenade>(hitActor))
+		{
+			Cast<AGrenade>(hitActor)->Collider->AddImpulse(FVector(hitActor->GetActorLocation() - MuzzleLoc).GetSafeNormal() * 50000);
 		}
 			
 		hitActor = nullptr;
