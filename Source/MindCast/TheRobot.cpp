@@ -53,6 +53,8 @@ void ATheRobot::BeginPlay()
 void ATheRobot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+
 }
 
 // Called to bind functionality to input
@@ -71,6 +73,9 @@ void ATheRobot::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ATheRobot::StopAiming);
 	PlayerInputComponent->BindAction("Shoot", IE_Pressed, this, &ATheRobot::Shoot);
 	PlayerInputComponent->BindAction("DeployDrone", IE_Pressed, this, &ATheRobot::DeployDrone);
+	PlayerInputComponent->BindAction("ThrowGrenade", IE_Pressed, this, &ATheRobot::BuildUpGrenadeVelocity);
+	PlayerInputComponent->BindAction("ThrowGrenade", IE_Released, this, &ATheRobot::CallReleaseGrenade);
+
 }
 
 void ATheRobot::MoveForwardAxis(float AxisValue)
@@ -205,8 +210,10 @@ void ATheRobot::Shoot()
 			ImpulseDirection = ImpactPoint - MuzzleLoc;
 			UKismetMathLibrary::Vector_Normalize(ImpulseDirection);
 
-			HitPhysicsProp->Mesh->AddImpulse(ImpulseDirection * HitPhysicsProp->Mesh->GetMass() * 6000);
+			HitPhysicsProp->Mesh->AddImpulseAtLocation(ImpulseDirection * HitPhysicsProp->Mesh->GetMass() * ImpulseMultiplier, ImpactPoint);
+			HitPhysicsProp->Mesh->AddImpulse(ImpulseDirection * HitPhysicsProp->Mesh->GetMass() * 3000);
 			HitPhysicsProp = nullptr;
+			
 		}
 		else if (Cast<AGrenade>(hitActor))
 		{
@@ -290,4 +297,20 @@ void ATheRobot::RepossessRobot()
 	CurrentPlayerController->Possess(this);
 	CurrentPlayerController->SetViewTargetWithBlend(this, 0.3);
 	EnableInput(CurrentPlayerController);
+}
+
+void ATheRobot::ReleaseGrenade()
+{
+	FVector CameraLocation = RobotCamera->GetComponentLocation();
+	FVector CameraForwardVector = RobotCamera->GetForwardVector();
+	AGrenade* SpawnedGrenade = CurrentWorld->SpawnActor<AGrenade>(GrenadeToSpawn, CameraLocation + CameraForwardVector * 150, FRotator(0, 0, 0));
+
+	if (SpawnedGrenade) {
+		SpawnedGrenade->Collider->AddImpulse(
+			(CameraForwardVector * GrenadeMultiplier * GrenadeMaxVelocity) +
+			(CameraForwardVector * GrenadeMinVelocity)
+		);
+	}
+	
+
 }

@@ -9,6 +9,7 @@
 #include "Sound/SoundBase.h"
 #include "Particles/ParticleSystem.h"
 #include "GameFramework/DamageType.h"
+#include "TimerManager.h"
 #include "Grenade.generated.h"
 
 UCLASS()
@@ -30,7 +31,19 @@ public:
 		UParticleSystem* Explosion;
 
 	UPROPERTY(EditAnywhere)
+		UParticleSystem* ShockWave;
+
+	UPROPERTY(EditAnywhere)
 		TSubclassOf<UDamageType> Damage;
+
+	UPROPERTY(EditAnywhere)
+		USoundBase* ExplosionSound;
+
+	FTimerHandle ExplosionHandle;
+
+	UWorld* CurrentWorld;
+
+	void Explode();
 
 
 protected:

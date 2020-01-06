@@ -140,7 +140,7 @@ public:
 	//--/Receive drone--//
 
 
-
+	//--Shooting--//
 	UCharacterMovementComponent* OurMovementComponent;
 
 	UWorld* CurrentWorld{ nullptr };
@@ -157,6 +157,11 @@ public:
 	FVector ImpactPoint{ 0,0,0 };
 	FVector TraceEndPoint{ 0,0,0 };
 	FRotator ProjectileRotation{ 0.f,0.f,0.f };
+
+	UPROPERTY(EditAnywhere)
+	float ImpulseMultiplier;
+
+	//--/Shooting--//
 
 	//Set from blueprint (Didn't get socket functionality on mesh added from C++)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -186,6 +191,36 @@ public:
 	FVector traceStart{ 0 };
 	FVector traceEnd{ 0 };
 	//---/HitResultVars
+
+
+	//--Grenade--//
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Grenade)
+		float GrenadeMultiplier{ 0.f };
+
+	UPROPERTY(EditAnywhere, Category = Grenade)
+		float GrenadeMaxVelocity{0.f};
+
+	UPROPERTY(EditAnywhere, Category = Grenade)
+		float GrenadeMinVelocity{ 50.f };
+
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void BuildUpGrenadeVelocity();
+
+
+	UFUNCTION(BlueprintImplementableEvent)
+		void CallReleaseGrenade();
+
+
+	UFUNCTION(BlueprintCallable)
+		void ReleaseGrenade();
+
+	UPROPERTY(EditAnywhere, Category = Grenade)
+	TSubclassOf<class AGrenade>GrenadeToSpawn;
+	
+
+	//--/Grenade--//
 
 
 	FVector AimOffsett{ 0,0,0 };

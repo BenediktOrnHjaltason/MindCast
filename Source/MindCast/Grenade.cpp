@@ -22,9 +22,10 @@ AGrenade::AGrenade()
 void AGrenade::BeginPlay()
 {
 	Super::BeginPlay();
-
-	SetActorTickInterval(2.f);
 	DummyArray.Init(this, 1);
+
+	GetWorldTimerManager().SetTimer(ExplosionHandle, this, &AGrenade::Explode, 4, false);
+	CurrentWorld = GetWorld();
 }
 
 // Called every frame
@@ -32,6 +33,15 @@ void AGrenade::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	UGameplayStatics::ApplyRadialDamage(GetWorld(), 50000.f, GetActorLocation(), 10000, Damage, DummyArray);
+	
 }
 
+void AGrenade::Explode()
+{
+	FVector Location = GetActorLocation();
+	UGameplayStatics::SpawnEmitterAtLocation(CurrentWorld, Explosion, Location, FRotator(0, 0, 0), FVector(4,4,4),true);
+	UGameplayStatics::SpawnEmitterAtLocation(CurrentWorld, ShockWave, Location, FRotator(0, 0, 0), FVector(4,4,4), true);
+	UGameplayStatics::PlaySoundAtLocation(CurrentWorld, ExplosionSound, Location);
+	UGameplayStatics::ApplyRadialDamage(CurrentWorld, 70000.f, GetActorLocation(), 10000, Damage, DummyArray);
+	Destroy();
+}
