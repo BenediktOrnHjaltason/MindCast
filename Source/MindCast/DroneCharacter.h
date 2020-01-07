@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		UCameraComponent* Camera;
 
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class AGrenade> GrenadeToSpawn;
+
 	void Ascend(float AxisValue);
 	void Descend(float AxisValue);
 	void MoveForwardBackward(float AxisValue);
@@ -49,6 +52,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void CallLiftFromBackPack();
 
+	void DropGrenade();
 
 protected:
 	// Called when the game starts or when spawned

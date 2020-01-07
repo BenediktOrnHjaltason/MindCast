@@ -4,6 +4,7 @@
 #include "DroneCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Grenade.h"
 
 // Sets default values
 ADroneCharacter::ADroneCharacter()
@@ -45,6 +46,7 @@ void ADroneCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAxis("DroneDescend", this, &ADroneCharacter::Descend);
 	PlayerInputComponent->BindAxis("Forward_Backward", this, &ADroneCharacter::MoveForwardBackward);
 	PlayerInputComponent->BindAxis("LeftRight", this, &ADroneCharacter::MoveSideways);
+	PlayerInputComponent->BindAction("ThrowGrenade", IE_Pressed, this, &ADroneCharacter::DropGrenade);
 
 }
 
@@ -90,4 +92,13 @@ void ADroneCharacter::CallRotateToBackPack()
 void ADroneCharacter::CallLiftFromBackPack()
 {
 	LiftFromBackPack();
+}
+
+void ADroneCharacter::DropGrenade()
+{
+	FVector Location = GetActorLocation();
+	FVector ForwardVector = GetActorForwardVector();
+	AGrenade* SpawnedGrenade = GetWorld()->SpawnActor<AGrenade>(GrenadeToSpawn, Location + ForwardVector * 250, FRotator(0, 0, 0));
+
+	SpawnedGrenade->Collider->AddImpulse((ForwardVector * 3000));
 }
