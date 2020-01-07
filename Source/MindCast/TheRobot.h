@@ -13,6 +13,7 @@
 #include "Sound/SoundBase.h"
 #include "Components/ChildActorComponent.h"
 #include "DroneCharacter.h"
+#include "Particles/ParticleSystem.h"
 #include "TheRobot.generated.h"
 
 UCLASS()
@@ -55,6 +56,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* SpawnedDroneActor;
+
+	UPROPERTY(EditAnywhere)
+		UParticleSystem* BulletImpact;
 
 
 

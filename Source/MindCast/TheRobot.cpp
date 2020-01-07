@@ -178,8 +178,9 @@ void ATheRobot::Shoot()
 
 	if (hitActor) {
 		UE_LOG(LogTemp, Warning, TEXT("Actor hit: %s"), *hitActor->GetActorLabel())
-			
-			
+
+			UGameplayStatics::SpawnEmitterAtLocation(
+				CurrentWorld, BulletImpact, ImpactPoint, impactNormal.Rotation(), FVector(0.2, 0.2, 0.2), true);
 
 		ADecalActor* NewDecal = CurrentWorld->SpawnActor<ADecalActor>(
 			RifleDecalActor, (ImpactPoint + normal * 10), normal.Rotation() + FRotator(-90, 0, 0));
