@@ -3,6 +3,7 @@
 
 #include "TheRobot.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
@@ -11,6 +12,7 @@
 #include "Engine/DecalActor.h"
 #include "PhysicsProp.h"
 #include "Grenade.h"
+#include "Math/Vector.h"
 //#include "Math/Vector.h"
 
 
@@ -25,6 +27,7 @@ ATheRobot::ATheRobot()
 
 	Arms = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Arms"));
 	Arms->SetupAttachment(RobotCamera);
+
 }
 
 // Called when the game starts or when spawned
@@ -46,7 +49,6 @@ void ATheRobot::BeginPlay()
 	SpawnedDroneActor = SpawnedDrone;
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ATheRobot::Overlaps);
-	
 }
 
 // Called every frame
@@ -54,7 +56,29 @@ void ATheRobot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//CameraWobble
+	MovementVelocity = GetMovementComponent()->Velocity.Size();
 
+	if (MovementVelocity == 0) {
+		DeltaTimeMultiplier = 0;
+		SineInput = 0;}
+
+	else if (MovementVelocity < 601) {
+		DeltaTimeMultiplier = 8;
+		SineInput += DeltaTime * DeltaTimeMultiplier;
+	}
+	else if (MovementVelocity < 1501) {
+		DeltaTimeMultiplier = 10;
+		SineInput += DeltaTime * DeltaTimeMultiplier;
+	}
+
+	UE_LOG(LogTemp,Warning,TEXT("CameraY: %f"), RobotCamera->GetRelativeTransform().GetLocation().Y)
+
+	RobotCamera->SetRelativeLocation(FVector(
+		CameraWobbleCenter.X, UKismetMathLibrary::Lerp(CameraWobbleCenter.Y, CameraWobbleEndValue.Y, UKismetMathLibrary::Sin(SineInput)),
+			UKismetMathLibrary::Lerp(CameraWobbleCenter.Z, CameraWobbleEndValue.Z, UKismetMathLibrary::Abs(UKismetMathLibrary::Sin(SineInput)))));
+
+	// /CameraWobble
 }
 
 // Called to bind functionality to input
@@ -214,7 +238,6 @@ void ATheRobot::Shoot()
 			HitPhysicsProp->Mesh->AddImpulseAtLocation(ImpulseDirection * HitPhysicsProp->Mesh->GetMass() * ImpulseMultiplier, ImpactPoint);
 			HitPhysicsProp->Mesh->AddImpulse(ImpulseDirection * HitPhysicsProp->Mesh->GetMass() * 3000);
 			HitPhysicsProp = nullptr;
-			
 		}
 		else if (Cast<AGrenade>(hitActor))
 		{

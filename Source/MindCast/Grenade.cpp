@@ -42,6 +42,6 @@ void AGrenade::Explode()
 	UGameplayStatics::SpawnEmitterAtLocation(CurrentWorld, Explosion, Location, FRotator(0, 0, 0), FVector(4,4,4),true);
 	UGameplayStatics::SpawnEmitterAtLocation(CurrentWorld, ShockWave, Location, FRotator(0, 0, 0), FVector(4,4,4), true);
 	UGameplayStatics::PlaySoundAtLocation(CurrentWorld, ExplosionSound, Location);
-	UGameplayStatics::ApplyRadialDamage(CurrentWorld, 25000.f, GetActorLocation(), 5000, Damage, DummyArray);
+	UGameplayStatics::ApplyRadialDamage(CurrentWorld, 25000.f, GetActorLocation(), 5000, Damage, DummyArray,this);
 	Destroy();
 }

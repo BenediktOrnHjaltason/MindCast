@@ -14,6 +14,7 @@
 #include "Components/ChildActorComponent.h"
 #include "DroneCharacter.h"
 #include "Particles/ParticleSystem.h"
+#include "Camera/CameraShake.h"
 #include "TheRobot.generated.h"
 
 UCLASS()
@@ -249,7 +250,7 @@ public:
 	float ImpulseLength{ 0 };
 	FVector ImpulseDirection{ 0,0,0 };
 
-	//--Movent--//
+	//--Movement--//
 
 	UCharacterMovementComponent* CharMoveCompRef;
 
@@ -271,8 +272,18 @@ public:
 	FVector DroneLocationAtReentry;
 	FRotator DroneRotationAtReentry;
 
-	
+	//----Camera walking wobble----//
+	float SineInput;
+	float SineValue;
+	float MovementVelocity;
 
+	FVector CameraWobbleCenter{ 20, 0, 72 };
+	
+	UPROPERTY(EditAnywhere)
+		FVector CameraWobbleEndValue;
+	//---/Camera walking wobble----//
+
+	int DeltaTimeMultiplier{ 6 };
 
 
 
