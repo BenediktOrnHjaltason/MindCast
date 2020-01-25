@@ -1,5 +1,5 @@
 # MindCast
-Prototype
+FPS Prototype (Personal project, christmas vacation 2019)
 
 Features overview:
 
